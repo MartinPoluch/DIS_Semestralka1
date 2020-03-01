@@ -4,12 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GUI;
-using GUI.Core;
 using SimulationCore.Generators;
 
-namespace SimulationCore {
-	public class DiceGameMC : SimCore {
+namespace GUI.Core {
+	class DiceGame {
 
 		private readonly UniformRNG _firstPlayerGen; // Ferov generator
 		private readonly UniformRNG _secondPlayerGen; // Jozov generator
@@ -17,14 +15,13 @@ namespace SimulationCore {
 
 		private int[] _sequence;
 
-		public DiceGameMC(Random seeder) {
+		public DiceGame(Random seeder) {
 			_firstPlayerGen = new UniformRNG(seeder.Next(), 1, 6);
 			_secondPlayerGen = new UniformRNG(seeder.Next(), 1, 6);
 			_sequenceGen = new UniformRNG(seeder.Next(), 1, 6);
 			_sequence = new int[3];
 			FirstPlayerRolls = new int[3];
 			SecondPlayerRolls = new int[3];
-			Worker = null;
 		}
 
 		public int[] FirstPlayerRolls { get; set; }
@@ -35,11 +32,8 @@ namespace SimulationCore {
 
 		public int SecondPlayerWins { get; private set; }
 
-		public ChartSettings ChartSettings { get; set; }
 
-		public BackgroundWorker Worker { get; set; }
-
-		private void DoThreeDiceRolls(int[] playerRolls, UniformRNG generator) {
+		public void DoThreeDiceRolls(int[] playerRolls, UniformRNG generator) {
 			for (int roll = 0; roll < 3; roll++) {
 				playerRolls[roll] = generator.NextInt();
 			}
@@ -55,18 +49,8 @@ namespace SimulationCore {
 			_sequence[2] = _sequenceGen.NextInt();
 		}
 
-		protected override void DoReplication() {
-			DoThreeDiceRolls(FirstPlayerRolls, _firstPlayerGen);
-			DoThreeDiceRolls(SecondPlayerRolls, _secondPlayerGen);
 
-			FindWinner();
-
-			if ((Worker != null) && (ActualReplication > ChartSettings.SkipReplications) && (ActualReplication % ChartSettings.Step == 0)) {
-				Worker.ReportProgress(ActualReplication / NumberOfReplications, ActualReplication);
-			}
-		}
-
-		private void FindWinner() {
+		public void FindWinner() {
 			if (EqualRolls(FirstPlayerRolls, SecondPlayerRolls)) {
 				return; // remiza
 			}
@@ -93,15 +77,5 @@ namespace SimulationCore {
 		private bool EqualRolls(int[] player, int[] sequence) {
 			return (player[0] == sequence[0]) && (player[1] == sequence[1]) && (player[2] == sequence[2]);
 		}
-
-		public string TextResult() {
-			if (ActualReplication == 0) { // osetrenie delenia nulou
-				return "Actual replication is 0";
-			}
-			string feroOutput = $"Fero wins [%]: {((double) FirstPlayerWins / NumberOfReplications) * 100}";
-			string jozoOutput = $"Jozo wins [%]: {((double) SecondPlayerWins / NumberOfReplications) * 100}";
-			return $"{feroOutput}\n{jozoOutput}";
-		}
-
 	}
 }

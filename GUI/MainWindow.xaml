@@ -8,9 +8,9 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition  Height="*"></RowDefinition>
+            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition  Height="3*"></RowDefinition>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -39,14 +39,13 @@
             <TextBox Grid.Row="2" Grid.Column="1" Width="80" Height="20" Text="{Binding Replications}" Margin="0, 10, 10, 10"></TextBox>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="10">Step:</TextBlock>
-            <TextBox Grid.Row="3" Grid.Column="1" Width="80" Height="20" Text="{Binding Step}" Margin="0, 10, 10, 10"></TextBox>
+            <TextBox Grid.Row="3" Grid.Column="1" Width="80" Height="20" Text="{Binding ChartSettings.Step}" Margin="0, 10, 10, 10"></TextBox>
 
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="10">Skip results:</TextBlock>
-            <TextBox Grid.Row="4" Grid.Column="1" Width="80" Height="20" Text="{Binding SkipReplications}" Margin="0, 10, 10, 10"></TextBox>
+            <TextBox Grid.Row="4" Grid.Column="1" Width="80" Height="20" Text="{Binding ChartSettings.SkipReplications}" Margin="0, 10, 10, 10"></TextBox>
 
         </Grid>
-
-        <TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="true" AcceptsReturn="True" TextWrapping="Wrap"></TextBox>
+        <TextBox x:Name="TextOutput"  Grid.Row="0" Grid.Column="0" IsReadOnly="true" AcceptsReturn="True" TextWrapping="Wrap" Margin="0, 10, 10, 10"></TextBox>
 
         <local:ChartControl x:Name="FirstPlayerChart" Grid.Row="1" Grid.Column="0" Color="#0816d1">
         </local:ChartControl>

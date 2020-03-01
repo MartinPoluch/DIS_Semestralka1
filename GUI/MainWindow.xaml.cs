@@ -22,27 +22,21 @@ namespace GUI {
 	public partial class MainWindow : Window {
 
 		private DiceGameMC _simCore;
+	
 
 		public MainWindow() {
 			InitializeComponent();
 			DataContext = this;
 			Random seeder = new Random();
+			Replications = 1000000;
+			ChartSettings = new ChartSettings(1000, 300000);
 			_simCore = new DiceGameMC(seeder);
+			_simCore.ChartSettings = ChartSettings;
 			ReadyToStart();
-			InitializeCharts();
 		}
 
-		private void InitializeCharts() {
-			Replications = 1000;
-			Step = 1;
-			SkipReplications = 300;
-		}
-
+		public ChartSettings ChartSettings { get; set; }
 		public int Replications { get; set; }
-
-		public int Step { get; set; }
-
-		public int SkipReplications { get; set; }
 
 		private void ReadyToStart() {
 			_simCore.Stop = false;
@@ -70,6 +64,7 @@ namespace GUI {
 			worker.ProgressChanged += UpdateChartsOutput;
 			worker.RunWorkerCompleted += delegate(object o, RunWorkerCompletedEventArgs args) {
 				ReadyToStart();
+				LogTextOutput();
 			};
 			worker.RunWorkerAsync();
 		}
@@ -81,19 +76,15 @@ namespace GUI {
 		}
 
 		private void UpdateChartsOutput(object sender, ProgressChangedEventArgs e) {
-			int actualReplication = (int) e.UserState; 
+			double firstPlayerWinChance = (double)_simCore.FirstPlayerWins / _simCore.ActualReplication;
+			FirstPlayerChart.AddChartValue(_simCore.ActualReplication, firstPlayerWinChance);
 
-			if ((actualReplication > SkipReplications) && (actualReplication % Step == 0)) {
-				double firstPlayerWinChance = (double)_simCore.FirstPlayerWins / _simCore.ActualReplication;
-				FirstPlayerChart.AddChartValue(_simCore.ActualReplication, firstPlayerWinChance);
-
-				double secondPlayerWinChance = (double)_simCore.SecondPlayerWins / _simCore.ActualReplication;
-				SecondPlayerChart.AddChartValue(_simCore.ActualReplication, secondPlayerWinChance);
-			}
+			double secondPlayerWinChance = (double)_simCore.SecondPlayerWins / _simCore.ActualReplication;
+			SecondPlayerChart.AddChartValue(_simCore.ActualReplication, secondPlayerWinChance);
 		}
 
-		private void TextOutput() {
-
+		private void LogTextOutput() {
+			TextOutput.Text = _simCore.TextResult();
 		}
 	}
 }
