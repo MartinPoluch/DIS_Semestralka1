@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GUI.Core;
 using SimulationCore;
 
 namespace GUI {
@@ -21,32 +22,34 @@ namespace GUI {
 	/// </summary>
 	public partial class MainWindow : Window {
 
-		private DiceGameMC _simCore;
-	
+		private RandomGameMC randomGame;
+		private DiceGame _diceGame;
 
 		public MainWindow() {
 			InitializeComponent();
 			DataContext = this;
-			Random seeder = new Random();
 			Replications = 1000000;
 			ChartSettings = new ChartSettings(1000, 300000);
-			_simCore = new DiceGameMC(seeder);
-			_simCore.ChartSettings = ChartSettings;
+			Random seeder = new Random();
+			_diceGame = new DiceGame(seeder);
+			randomGame = new RandomGameMC(_diceGame);
+			randomGame.ChartSettings = ChartSettings;
 			ReadyToStart();
 		}
+
 
 		public ChartSettings ChartSettings { get; set; }
 		public int Replications { get; set; }
 
 		private void ReadyToStart() {
-			_simCore.Stop = false;
+			randomGame.Stop = false;
 			StartBtn.IsEnabled = true;
 			StopBtn.IsEnabled = false;
 		}
 
 
 		private void StartSimulation(object sender, RoutedEventArgs e) {
-			_simCore.Stop = false;
+			randomGame.Stop = false;
 			StartBtn.IsEnabled = false;
 			StopBtn.IsEnabled = true;
 			FirstPlayerChart.ChartValues.Clear(); //TODO co s osou X, jej max hodnota bude ina
@@ -57,9 +60,9 @@ namespace GUI {
 				WorkerSupportsCancellation = true
 			};
 
-			_simCore.Worker = worker;
+			randomGame.Worker = worker;
 			worker.DoWork += delegate(object o, DoWorkEventArgs args) {
-				_simCore.Simulate(Replications);
+				randomGame.Simulate(Replications);
 			};
 			worker.ProgressChanged += UpdateChartsOutput;
 			worker.RunWorkerCompleted += delegate(object o, RunWorkerCompletedEventArgs args) {
@@ -70,21 +73,21 @@ namespace GUI {
 		}
 
 		private void StopSimulation(object sender, RoutedEventArgs e) {
-			_simCore.Stop = true;
+			randomGame.Stop = true;
 			StartBtn.IsEnabled = true;
 			StopBtn.IsEnabled = false;
 		}
 
 		private void UpdateChartsOutput(object sender, ProgressChangedEventArgs e) {
-			double firstPlayerWinChance = (double)_simCore.FirstPlayerWins / _simCore.ActualReplication;
-			FirstPlayerChart.AddChartValue(_simCore.ActualReplication, firstPlayerWinChance);
+			double firstPlayerWinChance = (double)randomGame.DiceGame.FirstPlayerWins / randomGame.ActualReplication;
+			FirstPlayerChart.AddChartValue(randomGame.ActualReplication, firstPlayerWinChance);
 
-			double secondPlayerWinChance = (double)_simCore.SecondPlayerWins / _simCore.ActualReplication;
-			SecondPlayerChart.AddChartValue(_simCore.ActualReplication, secondPlayerWinChance);
+			double secondPlayerWinChance = (double)randomGame.DiceGame.SecondPlayerWins / randomGame.ActualReplication;
+			SecondPlayerChart.AddChartValue(randomGame.ActualReplication, secondPlayerWinChance);
 		}
 
 		private void LogTextOutput() {
-			TextOutput.Text = _simCore.TextResult();
+			TextOutput.Text = randomGame.TextResult();
 		}
 	}
 }

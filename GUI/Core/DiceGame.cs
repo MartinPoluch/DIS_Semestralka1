@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using SimulationCore.Generators;
 
 namespace GUI.Core {
-	class DiceGame {
+	public class DiceGame {
 
 		private readonly UniformRNG _firstPlayerGen; // Ferov generator
 		private readonly UniformRNG _secondPlayerGen; // Jozov generator
@@ -32,8 +32,9 @@ namespace GUI.Core {
 
 		public int SecondPlayerWins { get; private set; }
 
+		
 
-		public void DoThreeDiceRolls(int[] playerRolls, UniformRNG generator) {
+		private void DoThreeDiceRolls(int[] playerRolls, UniformRNG generator) {
 			for (int roll = 0; roll < 3; roll++) {
 				playerRolls[roll] = generator.NextInt();
 			}
@@ -49,6 +50,18 @@ namespace GUI.Core {
 			_sequence[2] = _sequenceGen.NextInt();
 		}
 
+
+		private bool EqualRolls(int[] player, int[] sequence) {
+			return (player[0] == sequence[0]) && (player[1] == sequence[1]) && (player[2] == sequence[2]);
+		}
+
+		public void GenerateFirstPlayer() {
+			DoThreeDiceRolls(FirstPlayerRolls, _firstPlayerGen);
+		}
+
+		public void GenerateSecondPlayer() {
+			DoThreeDiceRolls(SecondPlayerRolls, _secondPlayerGen);
+		}
 
 		public void FindWinner() {
 			if (EqualRolls(FirstPlayerRolls, SecondPlayerRolls)) {
@@ -72,10 +85,6 @@ namespace GUI.Core {
 					IncreaseSequence(); // zmen sequenciu
 				}
 			}
-		}
-
-		private bool EqualRolls(int[] player, int[] sequence) {
-			return (player[0] == sequence[0]) && (player[1] == sequence[1]) && (player[2] == sequence[2]);
 		}
 	}
 }

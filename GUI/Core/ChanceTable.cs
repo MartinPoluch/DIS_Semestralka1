@@ -8,10 +8,10 @@ using SimulationCore;
 namespace GUI.Core {
 	public class ChanceTable {
 
-		private DiceGameMC _diceGame;
+		private RandomGameMC _randomGame;
 
-		public ChanceTable(DiceGameMC diceGame) {
-			_diceGame = diceGame;
+		public ChanceTable(RandomGameMC randomGame) {
+			_randomGame = randomGame;
 		}
 
 		
