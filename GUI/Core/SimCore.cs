@@ -17,10 +17,10 @@ namespace SimulationCore {
 
 		protected abstract void DoReplication();
 
-		protected abstract void BeforeSimulation();
+		protected abstract void InitSimulation();
 
 		public void Simulate(int replications) {
-			BeforeSimulation();
+			InitSimulation();
 			NumberOfReplications = replications;
 			for (int replication = 0; replication < replications; replication++) {
 				ActualReplication = replication;

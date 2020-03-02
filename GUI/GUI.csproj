@@ -62,8 +62,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ChartSettings.cs" />
-    <Compile Include="Core\GameWithTableMC.cs" />
+    <Compile Include="Core\TableCreatorMC.cs" />
     <Compile Include="Core\DiceGame.cs" />
+    <Compile Include="Core\Helper.cs" />
     <Compile Include="Core\SimCore.cs" />
     <Compile Include="Core\UniformRNG.cs" />
     <Page Include="ChartControl.xaml">
