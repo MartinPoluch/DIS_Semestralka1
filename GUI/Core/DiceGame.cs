@@ -20,8 +20,7 @@ namespace GUI.Core {
 			_secondPlayerGen = new UniformRNG(seeder.Next(), 1, 6);
 			_sequenceGen = new UniformRNG(seeder.Next(), 1, 6);
 			_sequence = new int[3];
-			FirstPlayerRolls = new int[3];
-			SecondPlayerRolls = new int[3];
+			Reset();
 		}
 
 		public int[] FirstPlayerRolls { get; set; }
@@ -32,7 +31,12 @@ namespace GUI.Core {
 
 		public int SecondPlayerWins { get; private set; }
 
-		
+		public void Reset() {
+			FirstPlayerRolls = new int[3];
+			SecondPlayerRolls = new int[3];
+			FirstPlayerWins = 0;
+			SecondPlayerWins = 0;
+		}
 
 		private void DoThreeDiceRolls(int[] playerRolls, UniformRNG generator) {
 			for (int roll = 0; roll < 3; roll++) {

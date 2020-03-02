@@ -22,7 +22,7 @@ namespace GUI {
 	/// </summary>
 	public partial class MainWindow : Window {
 
-		private RandomGameMC randomGame;
+		private RandomGameMC _randomGame;
 		private DiceGame _diceGame;
 
 		public MainWindow() {
@@ -32,37 +32,37 @@ namespace GUI {
 			ChartSettings = new ChartSettings(1000, 300000);
 			Random seeder = new Random();
 			_diceGame = new DiceGame(seeder);
-			randomGame = new RandomGameMC(_diceGame);
-			randomGame.ChartSettings = ChartSettings;
+			_randomGame = new RandomGameMC(_diceGame);
+			_randomGame.ChartSettings = ChartSettings;
 			ReadyToStart();
 		}
-
 
 		public ChartSettings ChartSettings { get; set; }
 		public int Replications { get; set; }
 
 		private void ReadyToStart() {
-			randomGame.Stop = false;
+			_randomGame.Stop = false;
 			StartBtn.IsEnabled = true;
 			StopBtn.IsEnabled = false;
 		}
 
 
 		private void StartSimulation(object sender, RoutedEventArgs e) {
-			randomGame.Stop = false;
+			_randomGame.Stop = false;
 			StartBtn.IsEnabled = false;
 			StopBtn.IsEnabled = true;
-			FirstPlayerChart.ChartValues.Clear(); //TODO co s osou X, jej max hodnota bude ina
-			SecondPlayerChart.ChartValues.Clear();
+			FirstPlayerChart.Clear();
+			SecondPlayerChart.Clear();
+			TextOutput.Text = "Simulation is running ...";
 
 			BackgroundWorker worker = new BackgroundWorker {
 				WorkerReportsProgress = true,
 				WorkerSupportsCancellation = true
 			};
 
-			randomGame.Worker = worker;
+			_randomGame.Worker = worker;
 			worker.DoWork += delegate(object o, DoWorkEventArgs args) {
-				randomGame.Simulate(Replications);
+				_randomGame.Simulate(Replications);
 			};
 			worker.ProgressChanged += UpdateChartsOutput;
 			worker.RunWorkerCompleted += delegate(object o, RunWorkerCompletedEventArgs args) {
@@ -73,21 +73,22 @@ namespace GUI {
 		}
 
 		private void StopSimulation(object sender, RoutedEventArgs e) {
-			randomGame.Stop = true;
+			_randomGame.Stop = true;
 			StartBtn.IsEnabled = true;
 			StopBtn.IsEnabled = false;
 		}
 
 		private void UpdateChartsOutput(object sender, ProgressChangedEventArgs e) {
-			double firstPlayerWinChance = (double)randomGame.DiceGame.FirstPlayerWins / randomGame.ActualReplication;
-			FirstPlayerChart.AddChartValue(randomGame.ActualReplication, firstPlayerWinChance);
+			//TODO toto doriesit aby sa tu nemusel volat DiceGame
+			double firstPlayerWinChance = (double)_randomGame.DiceGame.FirstPlayerWins / _randomGame.ActualReplication;
+			FirstPlayerChart.AddChartValue(_randomGame.ActualReplication, firstPlayerWinChance);
 
-			double secondPlayerWinChance = (double)randomGame.DiceGame.SecondPlayerWins / randomGame.ActualReplication;
-			SecondPlayerChart.AddChartValue(randomGame.ActualReplication, secondPlayerWinChance);
+			double secondPlayerWinChance = (double)_randomGame.DiceGame.SecondPlayerWins / _randomGame.ActualReplication;
+			SecondPlayerChart.AddChartValue(_randomGame.ActualReplication, secondPlayerWinChance);
 		}
 
 		private void LogTextOutput() {
-			TextOutput.Text = randomGame.TextResult();
+			TextOutput.Text = _randomGame.TextResult();
 		}
 	}
 }

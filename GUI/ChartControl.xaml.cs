@@ -64,6 +64,11 @@ namespace GUI {
 			SetAxisLimits(replication);
 		}
 
+		public void Clear() {
+			ChartValues.Clear();
+			SetAxisLimits(1);
+		}
+
 		public double AxisMax {
 			get { return _axisMax; }
 			set {
