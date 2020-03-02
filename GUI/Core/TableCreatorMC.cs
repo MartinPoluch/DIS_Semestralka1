@@ -10,13 +10,11 @@ namespace GUI.Core {
 
 		public TableCreatorMC(DiceGame diceGame) {
 			DiceGame = diceGame;
-			WinChancesArr = new double[216, 216];
 			WinChancesDict = new Dictionary<int, double>();
 		}
 
 		public DiceGame DiceGame { get; set; }
 
-		public double[,] WinChancesArr { get; set; }
 
 		public Dictionary<int, double> WinChancesDict { get; set; }
 

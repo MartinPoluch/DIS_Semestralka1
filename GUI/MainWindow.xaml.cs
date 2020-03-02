@@ -22,33 +22,38 @@ namespace GUI {
 	/// </summary>
 	public partial class MainWindow : Window {
 
-		private RandomGameMC _randomGame;
+		private RandomGameMC _gameMC;
+		private TableCreatorMC _tableCreatorMc;
 		private DiceGame _diceGame;
 
 		public MainWindow() {
 			InitializeComponent();
 			DataContext = this;
 			Replications = 1000000;
+			TableReplications = 100;
 			ChartSettings = new ChartSettings(1000, 300000);
 			Random seeder = new Random();
 			_diceGame = new DiceGame(seeder);
-			_randomGame = new RandomGameMC(_diceGame);
-			_randomGame.ChartSettings = ChartSettings;
+			_gameMC = new RandomGameMC(_diceGame) {ChartSettings = ChartSettings};
+			_tableCreatorMc = new TableCreatorMC(_diceGame);
 			ReadyToStart();
 		}
 
 		public ChartSettings ChartSettings { get; set; }
 		public int Replications { get; set; }
 
+		public int TableReplications { get; set; }
+
 		private void ReadyToStart() {
-			_randomGame.Stop = false;
+			_gameMC.Stop = false;
 			StartBtn.IsEnabled = true;
 			StopBtn.IsEnabled = false;
+			CreateTableBtn.IsEnabled = true;
 		}
 
 
 		private void StartSimulation(object sender, RoutedEventArgs e) {
-			_randomGame.Stop = false;
+			_gameMC.Stop = false;
 			StartBtn.IsEnabled = false;
 			StopBtn.IsEnabled = true;
 			FirstPlayerChart.Clear();
@@ -60,9 +65,9 @@ namespace GUI {
 				WorkerSupportsCancellation = true
 			};
 
-			_randomGame.Worker = worker;
+			_gameMC.Worker = worker;
 			worker.DoWork += delegate(object o, DoWorkEventArgs args) {
-				_randomGame.Simulate(Replications);
+				_gameMC.Simulate(Replications);
 			};
 			worker.ProgressChanged += UpdateChartsOutput;
 			worker.RunWorkerCompleted += delegate(object o, RunWorkerCompletedEventArgs args) {
@@ -73,22 +78,40 @@ namespace GUI {
 		}
 
 		private void StopSimulation(object sender, RoutedEventArgs e) {
-			_randomGame.Stop = true;
+			_gameMC.Stop = true;
 			StartBtn.IsEnabled = true;
 			StopBtn.IsEnabled = false;
 		}
 
 		private void UpdateChartsOutput(object sender, ProgressChangedEventArgs e) {
 			//TODO toto doriesit aby sa tu nemusel volat DiceGame
-			double firstPlayerWinChance = (double)_randomGame.DiceGame.FirstPlayerWins / _randomGame.ActualReplication;
-			FirstPlayerChart.AddChartValue(_randomGame.ActualReplication, firstPlayerWinChance);
+			double firstPlayerWinChance = (double)_gameMC.DiceGame.FirstPlayerWins / _gameMC.ActualReplication;
+			FirstPlayerChart.AddChartValue(_gameMC.ActualReplication, firstPlayerWinChance);
 
-			double secondPlayerWinChance = (double)_randomGame.DiceGame.SecondPlayerWins / _randomGame.ActualReplication;
-			SecondPlayerChart.AddChartValue(_randomGame.ActualReplication, secondPlayerWinChance);
+			double secondPlayerWinChance = (double)_gameMC.DiceGame.SecondPlayerWins / _gameMC.ActualReplication;
+			SecondPlayerChart.AddChartValue(_gameMC.ActualReplication, secondPlayerWinChance);
 		}
 
 		private void LogTextOutput() {
-			TextOutput.Text = _randomGame.TextResult();
+			TextOutput.Text = _gameMC.TextResult();
+		}
+
+		private void CreateWinChanceTable(object sender, RoutedEventArgs e) {
+			//TODO znefunkci buttony start 
+			_tableCreatorMc.WinChancesDict.Clear();
+			BackgroundWorker worker = new BackgroundWorker {
+				WorkerReportsProgress = true,
+				WorkerSupportsCancellation = true
+			};
+
+			worker.DoWork += delegate (object o, DoWorkEventArgs args) {
+				_tableCreatorMc.CreateTable(TableReplications);
+			};
+			worker.RunWorkerCompleted += delegate (object o, RunWorkerCompletedEventArgs args) {
+				ReadyToStart();
+				MessageBox.Show("Done");
+			};
+			worker.RunWorkerAsync();
 		}
 	}
 }
