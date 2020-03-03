@@ -49,7 +49,10 @@ namespace SimulationCore {
 					DiceGame.SecondPlayerRolls = GameTable.GetBestResponseFromLimitedTable(DiceGame.FirstPlayerRolls, DiceGame.SecondPlayerRolls);
 					break;
 				}
-				
+				case GameMode.OwnStrategy: {
+
+					break;
+				}
 			}
 			
 			DiceGame.FindWinner();
@@ -57,6 +60,10 @@ namespace SimulationCore {
 			if ((Worker != null) && (ActualReplication > ChartSettings.SkipReplications) && (ActualReplication % ChartSettings.Step == 0)) {
 				Worker.ReportProgress(ActualReplication / NumberOfReplications, ActualReplication); //TODO poslat vsetky parametre
 			}
+		}
+
+		private void BestResponseAlgorithm() {
+			int firstPlayer = DiceGame.FirstPlayerRolls;
 		}
 
 		public string TextResult() {

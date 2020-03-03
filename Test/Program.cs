@@ -12,19 +12,18 @@ namespace Test {
 	
 	class Program {
 		static void Main(string[] args) {
-
-
-
-
-			Random seeder = new Random();
-			int replications = 1000;
-			DiceGame diceGame = new DiceGame(seeder);
-			//TableCreatorMC table = new TableCreatorMC(diceGame);
-			//table.CreateTable(100);
-			RandomGameMC randomGame = new RandomGameMC(diceGame, GameMode.AllRandom);
-			//randomGame.GameTable = table;
-			randomGame.Simulate(replications);
-			Console.WriteLine(randomGame.TextResult());
+			string s = "50";
+			double d = Convert.ToDouble(s);
+			Console.WriteLine(d);
+			//Random seeder = new Random();
+			//int replications = 1000;
+			//DiceGame diceGame = new DiceGame(seeder);
+			////TableCreatorMC table = new TableCreatorMC(diceGame);
+			////table.CreateTable(100);
+			//RandomGameMC randomGame = new RandomGameMC(diceGame, GameMode.AllRandom);
+			////randomGame.GameTable = table;
+			//randomGame.Simulate(replications);
+			//Console.WriteLine(randomGame.TextResult());
 
 			//bool checkArray = false;
 			//Random seeder = new Random();

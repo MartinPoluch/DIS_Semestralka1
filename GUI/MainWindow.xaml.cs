@@ -14,7 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using GUI.Core;
+using Microsoft.Win32;
 using SimulationCore;
+using Path = System.IO.Path;
 
 namespace GUI {
 	/// <summary>
@@ -41,8 +43,6 @@ namespace GUI {
 				GameTable = _tableCreatorMc
 			};
 			
-			
-
 			EnableControls();
 			ExportFileName = "SimulationOutput";
 			CreatingTable = false;
@@ -118,11 +118,10 @@ namespace GUI {
 		}
 
 		private void UpdateChartsOutput(object sender, ProgressChangedEventArgs e) {
-			//TODO toto doriesit aby sa tu nemusel volat DiceGame
-			double firstPlayerWinChance = (double)_gameMC.DiceGame.FirstPlayerWins / _gameMC.ActualReplication;
+			double firstPlayerWinChance = ((double)_gameMC.DiceGame.FirstPlayerWins / _gameMC.ActualReplication) * 100;
 			FirstPlayerChart.AddChartValue(_gameMC.ActualReplication, firstPlayerWinChance);
 
-			double secondPlayerWinChance = (double)_gameMC.DiceGame.SecondPlayerWins / _gameMC.ActualReplication;
+			double secondPlayerWinChance = ((double)_gameMC.DiceGame.SecondPlayerWins / _gameMC.ActualReplication) * 100;
 			SecondPlayerChart.AddChartValue(_gameMC.ActualReplication, secondPlayerWinChance);
 		}
 
@@ -198,6 +197,39 @@ namespace GUI {
 				MessageBox.Show($"Radio button error. Game mode not detected.\n {sender.ToString()}");
 			}
 			TextOutput.Text = $"Game mode changed to {_gameMC.GameMode.ToString()}";
+		}
+
+		private void ImportTableFromFile(object sender, RoutedEventArgs e) {
+			bool success = false;
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+			if (openFileDialog.ShowDialog() == true) {
+				DisableControls();
+				TextOutput.Text = "Importing table ...";
+				BackgroundWorker worker = new BackgroundWorker {
+					WorkerReportsProgress = true,
+					WorkerSupportsCancellation = true
+				};
+
+				worker.DoWork += delegate (object o, DoWorkEventArgs args) {
+					_tableCreatorMc.ReadWinChancesFromFile(openFileDialog.FileName);
+					try {
+						
+						success = true;
+					}
+					catch (Exception exception) {
+						MessageBox.Show("Cannot import file, file has from format.");
+					} 
+					
+				};
+				worker.RunWorkerCompleted += delegate (object o, RunWorkerCompletedEventArgs args) {
+					EnableControls();
+					if (success) {
+						MessageBox.Show("File was successfully imported");
+					}
+				};
+				worker.RunWorkerAsync();
+			}
+			
 		}
 	}
 }

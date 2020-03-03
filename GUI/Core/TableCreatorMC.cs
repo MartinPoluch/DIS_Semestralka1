@@ -111,12 +111,8 @@ namespace GUI.Core {
 		public void WriteWinChancesToFile(string fileName) {
 			string docPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 			using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, fileName))) {
-				outputFile.Write(" ;");
-				foreach (int combination in _combinations) {
-					outputFile.Write($"{combination};"); // hlavicka (kombinacie)
-				}
-				outputFile.WriteLine();
-				outputFile.Write($"{_combinations[0]};"); // prva kombinacia prveho riadku
+				WriteHeaderToFile(outputFile);
+
 				int row = 0;
 				int column = 0;
 				foreach (KeyValuePair<int, double> keyValuePair in WinChances) {
@@ -124,12 +120,27 @@ namespace GUI.Core {
 						column = 0;
 						outputFile.WriteLine();
 						row++;
-						outputFile.Write($"{_combinations[row]};"); // prva hodnota v riadku je kombinacia
+						outputFile.Write($"{_combinations[row]};"); // prva hodnota v riadku je kombinacia (header)
 					}	
 					column++;
-					outputFile.Write($"{keyValuePair.Value};");
+					outputFile.Write(keyValuePair.Value);
+					if (column != 216) {
+						outputFile.Write(";");
+					}
 				}
 			}
+		}
+
+		private void WriteHeaderToFile(StreamWriter outputFile) {
+			outputFile.Write(" ;");
+			foreach (int combination in _combinations) {
+				outputFile.Write(combination); // hlavicka (kombinacie)
+				if (combination != 666) {
+					outputFile.Write(";");
+				}
+			}
+			outputFile.WriteLine();
+			outputFile.Write($"{_combinations[0]};"); // prva kombinacia prveho riadku
 		}
 
 		public void WriteBestResponsesToFile(string fileName) {
@@ -141,5 +152,39 @@ namespace GUI.Core {
 			}
 		}
 
+		public void ReadWinChancesFromFile(string filePath) {
+			WinChances.Clear();
+			string[] lines = System.IO.File.ReadAllLines(filePath);
+			for (int row = 1; row <= 216; row++) {
+				int firstPlayer = _combinations[row - 1];
+				string line = lines[row];
+
+				double[] chances = new double[216];
+				string[] strNums = line.Split(';');
+				for (int i = 0; i < chances.Length; i++) {
+					if (Double.TryParse(strNums[i + 1], out double chance)) {
+						chances[i] = chance; // pole chances je o jeden index pozadu pretoze strNums obsahuje aj header
+					}
+					else {
+						Console.WriteLine($"Wrong input when reading from file. Input:{strNums[i]}");
+					}
+				}
+				
+				int bestResponse = 0;
+				double bestChance = 0;
+				for (int column = 0; column < 216; column++) {
+					int secondPlayer = _combinations[column];
+					int combination = (firstPlayer * 1000) + secondPlayer;
+					double chance = chances[column];
+					WinChances.Add(combination, chance);
+					if (chance > bestChance) {
+						bestChance = chance;
+						bestResponse = secondPlayer;
+					}
+
+				}
+				BestResponses.Add(firstPlayer, bestResponse);
+			}
+		}
 	}
 }
