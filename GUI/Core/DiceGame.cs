@@ -44,31 +44,35 @@ namespace GUI.Core {
 			SecondPlayerWins = 0;
 		}
 
-		private int DoThreeDiceRolls(UniformRNG generator) {
-			int firstRoll = generator.NextInt();
-			int secondRoll = generator.NextInt();
-			int thirdRoll = generator.NextInt();
-			return (firstRoll * 100) + (secondRoll * 10) + thirdRoll;
-		}
-
 		private void IncreaseSequence() {
 			_sequence %= 100;
 			_sequence *= 10;
 			_sequence += _sequenceGen.NextInt();
 		}
 
+		private int DoDiceRolls(int rolls, UniformRNG generator) {
+			switch (rolls) {
+				case 3: {
+					return (generator.NextInt() * 100) + (generator.NextInt() * 10) + generator.NextInt();
+				}
+				case 2: {
+					return (generator.NextInt() * 10) + generator.NextInt();
+				}
+				case 1: {
+					return generator.NextInt();
+				}
+				default: {
+					return 0;
+				}
+			}
+		}
+
 		public void GenerateFirstPlayer() {
-			FirstPlayerRolls = DoThreeDiceRolls(_firstPlayerGen);
+			FirstPlayerRolls = DoDiceRolls(3, _firstPlayerGen);
 		}
 
-		public void GenerateSecondPlayer() {
-			SecondPlayerRolls = DoThreeDiceRolls(_secondPlayerGen);
-		}
-
-		public void GenerateTwoRollsForSecondPlayer() {
-			int firstRoll = _secondPlayerGen.NextInt();
-			int secondRoll = _secondPlayerGen.NextInt();
-			SecondPlayerRolls = (firstRoll * 10) + secondRoll;
+		public void GenerateSecondPlayer(int rolls = 3) {
+			SecondPlayerRolls = DoDiceRolls(rolls, _secondPlayerGen);
 		}
 
 		public void FindWinner() {
@@ -76,7 +80,7 @@ namespace GUI.Core {
 				return; // remiza
 			}
 
-			_sequence = DoThreeDiceRolls(_sequenceGen); // inicializujem sekvenciu
+			_sequence = DoDiceRolls(3, _sequenceGen); // inicializujem sekvenciu
 			while (true) { // pokial nikdo nevyhral
 				if (FirstPlayerRolls == _sequence) { // ci vyhral prvy hrac
 					FirstPlayerWins++;

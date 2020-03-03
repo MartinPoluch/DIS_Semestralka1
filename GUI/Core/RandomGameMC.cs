@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,12 +46,12 @@ namespace SimulationCore {
 					break;
 				}
 				case GameMode.LimitedTable: {
-					DiceGame.GenerateTwoRollsForSecondPlayer();
+					DiceGame.GenerateSecondPlayer(2);
 					DiceGame.SecondPlayerRolls = GameTable.GetBestResponseFromLimitedTable(DiceGame.FirstPlayerRolls, DiceGame.SecondPlayerRolls);
 					break;
 				}
 				case GameMode.OwnStrategy: {
-
+					BestResponseAlgorithm();
 					break;
 				}
 			}
@@ -64,6 +65,20 @@ namespace SimulationCore {
 
 		private void BestResponseAlgorithm() {
 			int firstPlayer = DiceGame.FirstPlayerRolls;
+			firstPlayer /= 10;
+			int secondRoll = firstPlayer % 10;
+			firstPlayer /= 10;
+			int firstRoll = firstPlayer % 10;
+
+			if (firstRoll == secondRoll) {
+				DiceGame.SecondPlayerRolls = (firstRoll == 1) ? 2 : 1; // osetruje remizi, druhy hrac nikdy neodpovie rovnakym cislom
+			}
+			else {
+				DiceGame.GenerateSecondPlayer(1);
+			}
+
+			DiceGame.SecondPlayerRolls *= 100;
+			DiceGame.SecondPlayerRolls += (firstRoll * 10) + secondRoll;
 		}
 
 		public string TextResult() {
