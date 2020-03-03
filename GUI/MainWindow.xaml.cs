@@ -31,31 +31,48 @@ namespace GUI {
 			DataContext = this;
 			Replications = 1000000;
 			TableReplications = 100;
+
 			ChartSettings = new ChartSettings(1000, 300000);
-			Random seeder = new Random();
+			Random seeder = new Random(1);
 			_diceGame = new DiceGame(seeder);
-			_gameMC = new RandomGameMC(_diceGame) {ChartSettings = ChartSettings};
+			_gameMC = new RandomGameMC(_diceGame, GameMode.AllRandom) {
+				ChartSettings = ChartSettings,
+			};
 			_tableCreatorMc = new TableCreatorMC(_diceGame);
-			ReadyToStart();
+
+			EnableControls();
+			ExportFileName = "SimulationOutput";
+			//GameMode = GameMode.All_random;
 		}
+		//public GameMode GameMode { get; set; }
 
 		public ChartSettings ChartSettings { get; set; }
 		public int Replications { get; set; }
 
 		public int TableReplications { get; set; }
 
-		private void ReadyToStart() {
-			_gameMC.Stop = false;
+		public string ExportFileName { get; set; }
+
+		private void EnableControls() {
 			StartBtn.IsEnabled = true;
 			StopBtn.IsEnabled = false;
-			CreateTableBtn.IsEnabled = true;
+			GameModeGroup.IsEnabled = true;
+			ChartGroup.IsEnabled = true;
+			TableGroup.IsEnabled = true;
+		}
+
+		private void DisableControls() {
+			StartBtn.IsEnabled = false;
+			StopBtn.IsEnabled = true;
+			GameModeGroup.IsEnabled = false;
+			ChartGroup.IsEnabled = false;
+			TableGroup.IsEnabled = false;
 		}
 
 
 		private void StartSimulation(object sender, RoutedEventArgs e) {
 			_gameMC.Stop = false;
-			StartBtn.IsEnabled = false;
-			StopBtn.IsEnabled = true;
+			DisableControls();
 			FirstPlayerChart.Clear();
 			SecondPlayerChart.Clear();
 			TextOutput.Text = "Simulation is running ...";
@@ -71,7 +88,7 @@ namespace GUI {
 			};
 			worker.ProgressChanged += UpdateChartsOutput;
 			worker.RunWorkerCompleted += delegate(object o, RunWorkerCompletedEventArgs args) {
-				ReadyToStart();
+				EnableControls();
 				LogTextOutput();
 			};
 			worker.RunWorkerAsync();
@@ -79,8 +96,8 @@ namespace GUI {
 
 		private void StopSimulation(object sender, RoutedEventArgs e) {
 			_gameMC.Stop = true;
-			StartBtn.IsEnabled = true;
-			StopBtn.IsEnabled = false;
+			//TODO treba byt schopny zastavit vytvaranie tabulky
+			EnableControls();
 		}
 
 		private void UpdateChartsOutput(object sender, ProgressChangedEventArgs e) {
@@ -97,21 +114,66 @@ namespace GUI {
 		}
 
 		private void CreateWinChanceTable(object sender, RoutedEventArgs e) {
-			//TODO znefunkci buttony start 
-			_tableCreatorMc.WinChancesDict.Clear();
+			DisableControls();
+			TextOutput.Text = "Creating table ...";
+			BackgroundWorker worker = new BackgroundWorker {
+				WorkerReportsProgress = true,
+				WorkerSupportsCancellation = true
+			};
+
+			_tableCreatorMc.Worker = worker;
+			worker.DoWork += delegate (object o, DoWorkEventArgs args) {
+				_tableCreatorMc.CreateTable(TableReplications);
+			};
+			worker.ProgressChanged += delegate (object o, ProgressChangedEventArgs args) {
+				TextOutput.Text = $"Creating table ... processing combination {args.UserState}";
+			};
+			worker.RunWorkerCompleted += delegate(object o, RunWorkerCompletedEventArgs args) {
+				EnableControls();
+				MessageBox.Show("Table was successfully created");
+			};
+			worker.RunWorkerAsync();
+		}
+
+	
+
+		private void ExportTableToFile(object sender, RoutedEventArgs e) {
+			DisableControls();
+			TextOutput.Text = "Exporting table ...";
 			BackgroundWorker worker = new BackgroundWorker {
 				WorkerReportsProgress = true,
 				WorkerSupportsCancellation = true
 			};
 
 			worker.DoWork += delegate (object o, DoWorkEventArgs args) {
-				_tableCreatorMc.CreateTable(TableReplications);
+				string extension = ".csv";
+				_tableCreatorMc.WriteWinChancesToFile($"Table_{ExportFileName}{extension}");
+				_tableCreatorMc.WriteBestResponsesToFile($"Responses_{ExportFileName}{extension}");
 			};
 			worker.RunWorkerCompleted += delegate (object o, RunWorkerCompletedEventArgs args) {
-				ReadyToStart();
-				MessageBox.Show("Done");
+				EnableControls();
+				MessageBox.Show("File was successfully exported");
 			};
 			worker.RunWorkerAsync();
+		}
+
+		private void RadioButton_Click(object sender, RoutedEventArgs e) {
+			if (Equals(sender, AllRandomRb)) {
+				_gameMC.GameMode = GameMode.AllRandom;
+			}
+			else if (Equals(sender, LimitedTableRb)) {
+				_gameMC.GameMode = GameMode.LimitedTable;
+			}
+			else if (Equals(sender, OwnStrategyRb)) {
+				_gameMC.GameMode = GameMode.OwnStrategy;
+			}
+			else if (Equals(sender, UnLimitedTableRb)) {
+				_gameMC.GameMode = GameMode.UnlimitedTable;
+			}
+			else {
+				MessageBox.Show($"Radio button error. Game mode not detected.\n {sender.ToString()}");
+			}
+			TextOutput.Text = $"Game mode changed to {_gameMC.GameMode.ToString()}";
 		}
 	}
 }

@@ -20,6 +20,7 @@ namespace SimulationCore {
 		protected abstract void InitSimulation();
 
 		public void Simulate(int replications) {
+			Stop = false;
 			InitSimulation();
 			NumberOfReplications = replications;
 			for (int replication = 0; replication < replications; replication++) {

@@ -62,6 +62,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ChartSettings.cs" />
+    <Compile Include="Core\GameMode.cs" />
     <Compile Include="Core\TableCreatorMC.cs" />
     <Compile Include="Core\DiceGame.cs" />
     <Compile Include="Core\Helper.cs" />

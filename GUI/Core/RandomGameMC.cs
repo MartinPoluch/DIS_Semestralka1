@@ -11,10 +11,16 @@ using SimulationCore.Generators;
 namespace SimulationCore {
 	public class RandomGameMC : SimCore {
 
-		public RandomGameMC(DiceGame diceGame) {
+		public RandomGameMC(DiceGame diceGame, GameMode gameMode) {
 			DiceGame = diceGame;
 			Worker = null;
+			GameMode = gameMode;
+			GameTable = null;
 		}
+
+		public GameMode GameMode { get; set; }
+
+		public TableCreatorMC GameTable { get; set; }
 
 		public ChartSettings ChartSettings { get; set; }
 
@@ -28,7 +34,17 @@ namespace SimulationCore {
 
 		protected override void DoReplication() {
 			DiceGame.GenerateFirstPlayer();
-			DiceGame.GenerateSecondPlayer();
+
+			switch (GameMode) {
+				case GameMode.AllRandom: {
+					DiceGame.GenerateSecondPlayer();
+					break;
+				}
+				case GameMode.UnlimitedTable: {
+					break;
+				}
+			}
+			
 
 			DiceGame.FindWinner();
 

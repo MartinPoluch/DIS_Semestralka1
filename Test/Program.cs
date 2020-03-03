@@ -22,33 +22,49 @@ namespace Test {
 			//RandomGameMC randomGame = new RandomGameMC(diceGame);
 			//randomGame.Simulate(replications);
 			//Console.WriteLine(randomGame.TextResult());
-			bool checkArray = false;
+			//bool checkArray = false;
 			Random seeder = new Random();
 			int replications = 100;
 			DiceGame diceGame = new DiceGame(seeder);
 			TableCreatorMC gameWithTable = new TableCreatorMC(diceGame);
+			gameWithTable.CreateTable(10);
 
-			if (checkArray) {
-				gameWithTable.CreateTableArray(replications);
-				for (int i = 0; i < 216; i++) {
-					for (int j = 0; j < 216; j++) {
-						double item = gameWithTable.WinChancesArr[i, j];
-						//Console.Write($"{gameWithTable.WinChancesArr[i, j]} ");
-					}
-					Console.WriteLine();
-				}
-			}
-			else {
-				gameWithTable.CreateTableDict(replications);
-				for (int i = 0; i < 216; i++) {
-					for (int j = 0; j < 216; j++) {
-						double item = gameWithTable.WinChancesDict[111111];
-					}
-				}
-				
-			}
+			//if (checkArray) {
+			//	gameWithTable.CreateTableArray(replications);
+			//	for (int i = 0; i < 216; i++) {
+			//		for (int j = 0; j < 216; j++) {
+			//			double item = gameWithTable.WinChancesArr[i, j];
+			//			//Console.Write($"{gameWithTable.WinChancesArr[i, j]} ");
+			//		}
+			//		Console.WriteLine();
+			//	}
+			//}
+			//else {
+			//	gameWithTable.CreateTableDict(replications);
+			//	for (int i = 0; i < 216; i++) {
+			//		for (int j = 0; j < 216; j++) {
+			//			double item = gameWithTable.WinChances[111111];
+			//		}
+			//	}
 
-			Console.WriteLine();
+			//}
+
+			//Console.WriteLine();
+			//Console.Read();
+
+
+
+			//for (int i = 1; i <= 6; i++) {
+			//	for (int j = 1; j <= 6; j++) {
+			//		for (int k = 1; k <= 6; k++) {
+			//			int number = i * 100 + j * 10 + k;
+			//			Console.Write($"{number}, ");
+			//		}
+			//		Console.WriteLine();
+			//	}
+
+			//}
+
 			Console.Read();
 		}
 
