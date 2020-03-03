@@ -33,18 +33,21 @@ namespace GUI {
 			TableReplications = 100;
 
 			ChartSettings = new ChartSettings(1000, 300000);
-			Random seeder = new Random(1);
+			Random seeder = new Random();
 			_diceGame = new DiceGame(seeder);
+			_tableCreatorMc = new TableCreatorMC(_diceGame);
 			_gameMC = new RandomGameMC(_diceGame, GameMode.AllRandom) {
 				ChartSettings = ChartSettings,
+				GameTable = _tableCreatorMc
 			};
-			_tableCreatorMc = new TableCreatorMC(_diceGame);
+			
+			
 
 			EnableControls();
 			ExportFileName = "SimulationOutput";
-			//GameMode = GameMode.All_random;
+			CreatingTable = false;
 		}
-		//public GameMode GameMode { get; set; }
+		
 
 		public ChartSettings ChartSettings { get; set; }
 		public int Replications { get; set; }
@@ -52,6 +55,8 @@ namespace GUI {
 		public int TableReplications { get; set; }
 
 		public string ExportFileName { get; set; }
+
+		public bool CreatingTable { get; set; }
 
 		private void EnableControls() {
 			StartBtn.IsEnabled = true;
@@ -71,7 +76,13 @@ namespace GUI {
 
 
 		private void StartSimulation(object sender, RoutedEventArgs e) {
+			if (((_gameMC.GameMode == GameMode.UnlimitedTable) || (_gameMC.GameMode == GameMode.LimitedTable)) && (_tableCreatorMc.WinChances.Count == 0)) {
+				MessageBox.Show("Table is not created, you need to create table first.");
+				return;
+			}
+
 			_gameMC.Stop = false;
+			_tableCreatorMc.Stop = false;
 			DisableControls();
 			FirstPlayerChart.Clear();
 			SecondPlayerChart.Clear();
@@ -95,8 +106,14 @@ namespace GUI {
 		}
 
 		private void StopSimulation(object sender, RoutedEventArgs e) {
-			_gameMC.Stop = true;
-			//TODO treba byt schopny zastavit vytvaranie tabulky
+			if (CreatingTable) {
+				CreatingTable = false;
+				_tableCreatorMc.Stop = true;
+			}
+			else {
+				_gameMC.Stop = true;
+			}
+			
 			EnableControls();
 		}
 
@@ -114,6 +131,7 @@ namespace GUI {
 		}
 
 		private void CreateWinChanceTable(object sender, RoutedEventArgs e) {
+			CreatingTable = true;
 			DisableControls();
 			TextOutput.Text = "Creating table ...";
 			BackgroundWorker worker = new BackgroundWorker {
@@ -130,7 +148,13 @@ namespace GUI {
 			};
 			worker.RunWorkerCompleted += delegate(object o, RunWorkerCompletedEventArgs args) {
 				EnableControls();
-				MessageBox.Show("Table was successfully created");
+				if (_tableCreatorMc.WinChances.Count == 0) {
+					MessageBox.Show("Creation of table was stopped.");
+				}
+				else {
+					MessageBox.Show("Table was successfully created");
+				}
+				CreatingTable = false;
 			};
 			worker.RunWorkerAsync();
 		}
@@ -144,7 +168,7 @@ namespace GUI {
 				WorkerReportsProgress = true,
 				WorkerSupportsCancellation = true
 			};
-
+		
 			worker.DoWork += delegate (object o, DoWorkEventArgs args) {
 				string extension = ".csv";
 				_tableCreatorMc.WriteWinChancesToFile($"Table_{ExportFileName}{extension}");

@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 using SimulationCore.Generators;
 
 namespace GUI.Core {
+
+	/// <summary>
+	/// V tejto triede su zapuzdrene vsetky generatory.
+	/// Ku generatorom sa neda pristupovat mimo tejto triedy.
+	/// Generovat nahodne cisla je mozne len pomocou public metod ktore obsahuju v nazve "Generate".
+	/// </summary>
 	public class DiceGame {
 
 		private readonly UniformRNG _firstPlayerGen; // Ferov generator
@@ -57,6 +63,12 @@ namespace GUI.Core {
 
 		public void GenerateSecondPlayer() {
 			SecondPlayerRolls = DoThreeDiceRolls(_secondPlayerGen);
+		}
+
+		public void GenerateTwoRollsForSecondPlayer() {
+			int firstRoll = _secondPlayerGen.NextInt();
+			int secondRoll = _secondPlayerGen.NextInt();
+			SecondPlayerRolls = (firstRoll * 10) + secondRoll;
 		}
 
 		public void FindWinner() {

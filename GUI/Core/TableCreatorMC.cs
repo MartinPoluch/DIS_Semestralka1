@@ -51,6 +51,11 @@ namespace GUI.Core {
 				double bestChance = 0;// doposial najlepsia najdena sanca na vyhru druheho hraca
 				int bestResponse = 0; // doposial najlepsia najdena odpoved na kombinaciu prveho hraca
 				foreach (int secondPlayer in _combinations) {
+					if (Stop) {
+						BestResponses.Clear();
+						WinChances.Clear();
+						return;
+					}
 					int combination = (firstPlayer * 1000) + secondPlayer;
 					if (firstPlayer == secondPlayer) {
 						WinChances.Add(combination, 0); //remiza
@@ -72,6 +77,27 @@ namespace GUI.Core {
 				}
 				BestResponses.Add(firstPlayer, bestResponse);
 			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public int GetBestResponseFromLimitedTable(int firstPlayer, int incompleteSecondPlayer) {
+			int bestResponse = 0;
+			double bestChance = 0;
+			for (int lastDigit = 1; lastDigit <= 6; lastDigit++) {
+				int secondPlayer = (incompleteSecondPlayer * 10) + lastDigit;
+				int combination = (firstPlayer * 1000) + secondPlayer;
+				double winChance = WinChances[combination];
+				if (winChance > bestChance) {
+					bestChance = winChance;
+					bestResponse = secondPlayer;
+				}
+			}
+
+			Console.WriteLine($"For {firstPlayer} is best response {bestResponse}");
+			return bestResponse;
 		}
 
 		protected override void InitSimulation() {

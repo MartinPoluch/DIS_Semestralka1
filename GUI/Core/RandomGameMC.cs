@@ -41,11 +41,17 @@ namespace SimulationCore {
 					break;
 				}
 				case GameMode.UnlimitedTable: {
+					DiceGame.SecondPlayerRolls = GameTable.BestResponses[DiceGame.FirstPlayerRolls];// vyberiem podla tabulky tu najlepsiu odpoved
 					break;
 				}
+				case GameMode.LimitedTable: {
+					DiceGame.GenerateTwoRollsForSecondPlayer();
+					DiceGame.SecondPlayerRolls = GameTable.GetBestResponseFromLimitedTable(DiceGame.FirstPlayerRolls, DiceGame.SecondPlayerRolls);
+					break;
+				}
+				
 			}
 			
-
 			DiceGame.FindWinner();
 
 			if ((Worker != null) && (ActualReplication > ChartSettings.SkipReplications) && (ActualReplication % ChartSettings.Step == 0)) {

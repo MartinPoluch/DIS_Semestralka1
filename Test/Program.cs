@@ -16,18 +16,21 @@ namespace Test {
 
 
 
-			//Random seeder = new Random();
-			//int replications = 1000000;
-			//DiceGame diceGame = new DiceGame(seeder);
-			//RandomGameMC randomGame = new RandomGameMC(diceGame);
-			//randomGame.Simulate(replications);
-			//Console.WriteLine(randomGame.TextResult());
-			//bool checkArray = false;
 			Random seeder = new Random();
-			int replications = 100;
+			int replications = 1000;
 			DiceGame diceGame = new DiceGame(seeder);
-			TableCreatorMC gameWithTable = new TableCreatorMC(diceGame);
-			gameWithTable.CreateTable(10);
+			//TableCreatorMC table = new TableCreatorMC(diceGame);
+			//table.CreateTable(100);
+			RandomGameMC randomGame = new RandomGameMC(diceGame, GameMode.AllRandom);
+			//randomGame.GameTable = table;
+			randomGame.Simulate(replications);
+			Console.WriteLine(randomGame.TextResult());
+
+			//bool checkArray = false;
+			//Random seeder = new Random();
+			//int replications = 100;
+			//DiceGame diceGame = new DiceGame(seeder);
+			
 
 			//if (checkArray) {
 			//	gameWithTable.CreateTableArray(replications);
