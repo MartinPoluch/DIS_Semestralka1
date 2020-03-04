@@ -22,7 +22,23 @@
                                 Stroke="{Binding Color}"
                                 Fill="Transparent"/>
             </wpf:CartesianChart.Series>
+
+            <wpf:CartesianChart.AxisX>
+                <wpf:Axis Title="{Binding NameOfX}" 
+                          DisableAnimations="True">
+                </wpf:Axis>
+            </wpf:CartesianChart.AxisX>
+
+            <wpf:CartesianChart.AxisY>
+                <wpf:Axis Title="{Binding NameOfY}" 
+                          DisableAnimations="True">
+                </wpf:Axis>
+            </wpf:CartesianChart.AxisY>
+
         </wpf:CartesianChart>
+
+     
+
     </Grid>
 </UserControl>
 

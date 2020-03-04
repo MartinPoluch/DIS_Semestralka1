@@ -133,10 +133,10 @@
 
 
 
-        <local:ChartControl x:Name="FirstPlayerChart" Grid.Row="1" Grid.Column="0" Color="#0816d1">
+        <local:ChartControl x:Name="FirstPlayerChart" Grid.Row="1" Grid.Column="0" Color="#0816d1" NameOfX="Replications" NameOfY="Chance of Fero">
         </local:ChartControl>
 
-        <local:ChartControl x:Name="SecondPlayerChart" Grid.Row="2" Grid.Column="0" Color="#db1009" Margin="0, 20, 0, 20">
+        <local:ChartControl x:Name="SecondPlayerChart" Grid.Row="2" Grid.Column="0" Color="#db1009" NameOfX="Replications" NameOfY="Chance of Jozo"  Margin="0, 20, 0, 20">
         </local:ChartControl>
 
         <TextBox x:Name="TextOutput"  Grid.Row="3" Grid.Column="0" IsReadOnly="true" AcceptsReturn="True" TextWrapping="Wrap" Margin="10, 10, 10, 10"></TextBox>

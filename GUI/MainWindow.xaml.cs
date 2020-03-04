@@ -83,11 +83,14 @@ namespace GUI {
 		}
 
 		private void CalculateStep() {
-			double sqrt = Math.Sqrt(Replications);
-			int step = (int) Math.Round(sqrt, -2);
-
+			if (Replications <= 100) {
+				ChartSettings.Step = 1;
+			}
+			else {
+				double sqrt = Math.Sqrt(Replications);
+				ChartSettings.Step = (int)Math.Ceiling(sqrt);
+			}
 		}
-
 
 		private void StartSimulation(object sender, RoutedEventArgs e) {
 			if (((_gameMC.GameMode == GameMode.UnlimitedTable) || (_gameMC.GameMode == GameMode.LimitedTable)) && (_tableCreatorMc.WinChances.Count == 0)) {
@@ -100,11 +103,12 @@ namespace GUI {
 				return;
 			}
 
-			if ((ChartSettings.Step == 0) || (StepInput.Text.Trim() == "")) {
+			if ((ChartSettings.Step == 0) || (StepInput.Text.Trim() == "") || (StepInput.Text == "0")) {
 				CalculateStep();
 			}
 
 			_gameMC.Stop = false;
+			_gameMC.ChartSettings = ChartSettings;
 			_tableCreatorMc.Stop = false;
 			DisableControls();
 			FirstPlayerChart.Clear();

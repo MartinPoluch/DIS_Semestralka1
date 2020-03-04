@@ -57,9 +57,7 @@ namespace SimulationCore {
 			}
 			
 			DiceGame.FindWinner();
-			//Console.WriteLine($"Actual:{ActualReplication} >= Skip: {ChartSettings.SkipReplications} && ActualRepl/Step= {ActualReplication % ChartSettings.Step}");
 			if ((Worker != null) && (ActualReplication >= ChartSettings.SkipReplications) && (ActualReplication % ChartSettings.Step == 0)) {
-				//Console.WriteLine("Wrtting");
 				int[] results = {DiceGame.FirstPlayerWins, DiceGame.SecondPlayerWins, ActualReplication};
 				Worker.ReportProgress(ActualReplication / NumberOfReplications, results);
 			}

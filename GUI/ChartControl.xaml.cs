@@ -53,6 +53,10 @@ namespace GUI {
 
 		public string Color { get; set; }
 
+		public string NameOfX { get; set; }
+
+		public string NameOfY { get; set; }
+
 		public ChartValues<MeasureModel> ChartValues { get; set; }
 
 		public void AddChartValue(int replication, double winPercentage) {
@@ -60,7 +64,6 @@ namespace GUI {
 				Replications = replication,
 				WinPercentage = winPercentage
 			};
-			Console.WriteLine($"Added {replication} {winPercentage}");
 			ChartValues.Add(model);
 			SetAxisLimits(replication);
 		}
