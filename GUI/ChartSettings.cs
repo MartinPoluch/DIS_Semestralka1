@@ -14,5 +14,7 @@ namespace GUI {
 		public int Step { get; set; }
 
 		public int SkipReplications { get; set; }
+
+		
 	}
 }

@@ -96,7 +96,6 @@ namespace GUI.Core {
 				}
 			}
 
-			Console.WriteLine($"For {firstPlayer} is best response {bestResponse}");
 			return bestResponse;
 		}
 
@@ -154,6 +153,7 @@ namespace GUI.Core {
 
 		public void ReadWinChancesFromFile(string filePath) {
 			WinChances.Clear();
+			BestResponses.Clear();
 			string[] lines = System.IO.File.ReadAllLines(filePath);
 			for (int row = 1; row <= 216; row++) {
 				int firstPlayer = _combinations[row - 1];

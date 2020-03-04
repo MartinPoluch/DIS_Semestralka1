@@ -57,12 +57,15 @@ namespace SimulationCore {
 			}
 			
 			DiceGame.FindWinner();
-
-			if ((Worker != null) && (ActualReplication > ChartSettings.SkipReplications) && (ActualReplication % ChartSettings.Step == 0)) {
-				Worker.ReportProgress(ActualReplication / NumberOfReplications, ActualReplication); //TODO poslat vsetky parametre
+			//Console.WriteLine($"Actual:{ActualReplication} >= Skip: {ChartSettings.SkipReplications} && ActualRepl/Step= {ActualReplication % ChartSettings.Step}");
+			if ((Worker != null) && (ActualReplication >= ChartSettings.SkipReplications) && (ActualReplication % ChartSettings.Step == 0)) {
+				//Console.WriteLine("Wrtting");
+				int[] results = {DiceGame.FirstPlayerWins, DiceGame.SecondPlayerWins, ActualReplication};
+				Worker.ReportProgress(ActualReplication / NumberOfReplications, results);
 			}
 		}
 
+		
 		private void BestResponseAlgorithm() {
 			int firstPlayer = DiceGame.FirstPlayerRolls;
 			firstPlayer /= 10;
@@ -71,7 +74,7 @@ namespace SimulationCore {
 			int firstRoll = firstPlayer % 10;
 
 			if (firstRoll == secondRoll) {
-				DiceGame.SecondPlayerRolls = (firstRoll == 1) ? 2 : 1; // osetruje remizi, druhy hrac nikdy neodpovie rovnakym cislom
+				DiceGame.SecondPlayerRolls = (firstRoll + secondRoll) % 7; // osetruje remizi, druhy hrac nikdy neodpovie rovnakym cislom
 			}
 			else {
 				DiceGame.GenerateSecondPlayer(1);

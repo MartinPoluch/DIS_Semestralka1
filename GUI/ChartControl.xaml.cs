@@ -60,6 +60,7 @@ namespace GUI {
 				Replications = replication,
 				WinPercentage = winPercentage
 			};
+			Console.WriteLine($"Added {replication} {winPercentage}");
 			ChartValues.Add(model);
 			SetAxisLimits(replication);
 		}

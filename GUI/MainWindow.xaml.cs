@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -64,6 +66,7 @@ namespace GUI {
 			GameModeGroup.IsEnabled = true;
 			ChartGroup.IsEnabled = true;
 			TableGroup.IsEnabled = true;
+			ReplicationInput.IsEnabled = true;
 		}
 
 		private void DisableControls() {
@@ -72,6 +75,17 @@ namespace GUI {
 			GameModeGroup.IsEnabled = false;
 			ChartGroup.IsEnabled = false;
 			TableGroup.IsEnabled = false;
+			ReplicationInput.IsEnabled = false;
+		}
+
+		private bool CheckBoxSimulationInput() {
+			return false;
+		}
+
+		private void CalculateStep() {
+			double sqrt = Math.Sqrt(Replications);
+			int step = (int) Math.Round(sqrt, -2);
+
 		}
 
 
@@ -81,13 +95,22 @@ namespace GUI {
 				return;
 			}
 
+			if (Replications <= 0) {
+				MessageBox.Show("Number of replications should be higher then zero.");
+				return;
+			}
+
+			if ((ChartSettings.Step == 0) || (StepInput.Text.Trim() == "")) {
+				CalculateStep();
+			}
+
 			_gameMC.Stop = false;
 			_tableCreatorMc.Stop = false;
 			DisableControls();
 			FirstPlayerChart.Clear();
 			SecondPlayerChart.Clear();
-			TextOutput.Text = "Simulation is running ...";
-
+			TextOutput.Text = $"Simulation is running ...";
+			TextOutput.Text += $"\nReplications: {Replications}\nSkip results: {ChartSettings.SkipReplications}\nStep: {ChartSettings.Step}";
 			BackgroundWorker worker = new BackgroundWorker {
 				WorkerReportsProgress = true,
 				WorkerSupportsCancellation = true
@@ -118,15 +141,20 @@ namespace GUI {
 		}
 
 		private void UpdateChartsOutput(object sender, ProgressChangedEventArgs e) {
-			double firstPlayerWinChance = ((double)_gameMC.DiceGame.FirstPlayerWins / _gameMC.ActualReplication) * 100;
-			FirstPlayerChart.AddChartValue(_gameMC.ActualReplication, firstPlayerWinChance);
+			int[] results = (int[]) e.UserState;
+			double firstPlayersWins = results[0];
+			double secondPlayersWins = results[1];
+			int actualReplications = results[2] + 1;
+			double firstPlayerWinChance = (firstPlayersWins / actualReplications) * 100;
+			FirstPlayerChart.AddChartValue(actualReplications, firstPlayerWinChance);
 
-			double secondPlayerWinChance = ((double)_gameMC.DiceGame.SecondPlayerWins / _gameMC.ActualReplication) * 100;
-			SecondPlayerChart.AddChartValue(_gameMC.ActualReplication, secondPlayerWinChance);
+			double secondPlayerWinChance = (secondPlayersWins / actualReplications) * 100;
+			SecondPlayerChart.AddChartValue(actualReplications, secondPlayerWinChance);
 		}
 
 		private void LogTextOutput() {
 			TextOutput.Text = _gameMC.TextResult();
+			TextOutput.Text += $"\nReplications: {Replications}\nSkip results: {ChartSettings.SkipReplications}\nStep: {ChartSettings.Step}";
 		}
 
 		private void CreateWinChanceTable(object sender, RoutedEventArgs e) {
@@ -157,8 +185,6 @@ namespace GUI {
 			};
 			worker.RunWorkerAsync();
 		}
-
-	
 
 		private void ExportTableToFile(object sender, RoutedEventArgs e) {
 			DisableControls();
@@ -211,13 +237,12 @@ namespace GUI {
 				};
 
 				worker.DoWork += delegate (object o, DoWorkEventArgs args) {
-					_tableCreatorMc.ReadWinChancesFromFile(openFileDialog.FileName);
 					try {
-						
+						_tableCreatorMc.ReadWinChancesFromFile(openFileDialog.FileName);
 						success = true;
 					}
 					catch (Exception exception) {
-						MessageBox.Show("Cannot import file, file has from format.");
+						MessageBox.Show($"Cannot import file, file has from format.\n{exception.Message}");
 					} 
 					
 				};
@@ -229,7 +254,11 @@ namespace GUI {
 				};
 				worker.RunWorkerAsync();
 			}
-			
+		}
+
+		public void CheckNumericInput(object sender, TextCompositionEventArgs e) {
+			Regex _regex = new Regex("[^0-9.-]+");
+			e.Handled = _regex.IsMatch(e.Text);
 		}
 	}
 }
