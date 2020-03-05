@@ -15,21 +15,25 @@ namespace Test {
 			string s = "50";
 			double d = Convert.ToDouble(s);
 			Console.WriteLine(d);
-			//Random seeder = new Random();
-			//int replications = 1000;
-			//DiceGame diceGame = new DiceGame(seeder);
-			////TableCreatorMC table = new TableCreatorMC(diceGame);
-			////table.CreateTable(100);
-			//RandomGameMC randomGame = new RandomGameMC(diceGame, GameMode.AllRandom);
-			////randomGame.GameTable = table;
-			//randomGame.Simulate(replications);
-			//Console.WriteLine(randomGame.TextResult());
+
+			Random seeder = new Random();
+			int replications = 1000000;
+			DiceGame diceGame = new DiceGame(seeder);
+			//TableCreatorMC table = new TableCreatorMC(diceGame);
+			//table.CreateTable(100);
+			RandomGameMC randomGame = new RandomGameMC(diceGame, GameMode.AllRandom);
+			//randomGame.GameTable = table;
+			randomGame.Simulate(replications);
+			Console.WriteLine(randomGame.TextResult());
+			Console.WriteLine("Jozo: " + diceGame.SecondPlayerWins);
+			Console.WriteLine("Fero: " + diceGame.FirstPlayerWins);
+			Console.WriteLine("Draws: " + (replications - diceGame.SecondPlayerWins - diceGame.FirstPlayerWins));
 
 			//bool checkArray = false;
 			//Random seeder = new Random();
 			//int replications = 100;
 			//DiceGame diceGame = new DiceGame(seeder);
-			
+
 
 			//if (checkArray) {
 			//	gameWithTable.CreateTableArray(replications);
